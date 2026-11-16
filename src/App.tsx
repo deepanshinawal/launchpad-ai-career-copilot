@@ -78,10 +78,27 @@ export default function App() {
         body: JSON.stringify(submittedProfile),
       });
 
-      const data = await response.json();
+      const rawBody = await response.text();
+      let data: Partial<CareerAnalysisResponse> & { error?: string } = {};
+
+      if (rawBody) {
+        try {
+          data = JSON.parse(rawBody) as Partial<CareerAnalysisResponse> & { error?: string };
+        } catch {
+          throw new Error(
+            response.ok
+              ? "Server returned an unexpected non-JSON response."
+              : `Server error (${response.status}): Please check your deployment logs and API configuration.`
+          );
+        }
+      }
 
       if (!response.ok) {
         throw new Error(data.error || `Request failed with status ${response.status}`);
+      }
+
+      if (!data.plan || !data.profile) {
+        throw new Error("Server response was missing career plan data.");
       }
 
       const result = data as CareerAnalysisResponse;

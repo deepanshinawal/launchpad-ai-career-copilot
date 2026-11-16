@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { ArrowRight, Compass, Layers, CheckSquare, FolderGit2 } from "lucide-react";
+import heroWorkspaceImg from "../assets/images/hero_career_workspace_1794760502521.jpg";
 
 interface LandingPageProps {
   onStartNow: () => void;
@@ -117,7 +118,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <div className="relative h-72 sm:h-96 lg:h-full min-h-[340px] rounded-xl overflow-hidden border border-slate-200 bg-[#0B1221]">
                   {!imageError ? (
                     <img
-                      src="/src/assets/images/hero_career_workspace_1794760502521.jpg"
+                      src={heroWorkspaceImg}
                       alt="University students collaborating on laptops in a bright engineering and design studio with navy acoustic panels"
                       referrerPolicy="no-referrer"
                       onError={() => setImageError(true)}
