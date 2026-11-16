@@ -1,0 +1,6 @@
+{
+  "name": "LaunchPad AI – Career Copilot",
+  "description": "AI-powered career planning copilot for college students featuring skill gap analysis, a 30-day 4-week learning roadmap, and tailored portfolio projects.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
