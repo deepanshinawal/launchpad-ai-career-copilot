@@ -1,6 +1,6 @@
 import "dotenv/config";
 import express from "express";
-import type { Request, Response } from "express";
+import type { Request, Response, NextFunction, RequestHandler } from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import { GoogleGenAI, Type } from "@google/genai";
@@ -340,12 +340,38 @@ Requirements:
   });
 
   if (!isProduction) {
-    const { createServer: createViteServer } = await import("vite");
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
+    let viteMiddleware: RequestHandler | null = null;
+    const viteReady = import("vite")
+      .then(({ createServer: createViteServer }) =>
+        createViteServer({
+          server: { middlewareMode: true },
+          appType: "spa",
+        })
+      )
+      .then((vite) => {
+        viteMiddleware = vite.middlewares;
+        return vite;
+      })
+      .catch((err) => {
+        console.error("Failed to initialize Vite dev middleware:", err);
+        throw err;
+      });
+
+    app.use((req: Request, res: Response, next: NextFunction) => {
+      if (viteMiddleware) {
+        viteMiddleware(req, res, next);
+        return;
+      }
+      viteReady
+        .then(() => {
+          if (viteMiddleware) {
+            viteMiddleware(req, res, next);
+          } else {
+            next(new Error("Vite middleware unavailable"));
+          }
+        })
+        .catch(next);
     });
-    app.use(vite.middlewares);
   } else {
     const distPath = path.resolve(__dirname, "dist");
     app.use(express.static(distPath));
